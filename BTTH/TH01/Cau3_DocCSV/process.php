@@ -1,100 +1,65 @@
 <?php
-session_start();
+// Đường dẫn tới file CSV
+$filename = "KTPM2.csv";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') { // Kiểm tra nếu form được gửi bằng phương thức POST
-    // Kiểm tra tệp CSV được tải lên
-    if (isset($_FILES['csv_file']) && $_FILES['csv_file']['error'] === UPLOAD_ERR_OK) {
-        $csvTmpPath = $_FILES['csv_file']['tmp_name'];
-        $fileName = $_FILES['csv_file']['name'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+// Mảng chứa dữ liệu sinh viên
+$sinhvien = [];
 
-        // Kiểm tra định dạng tệp
-        if ($fileExtension !== 'csv') {
-            echo "<p style='color: red;'>Only .csv files are accepted.</p>";
-            exit;
-        }
+// Đọc dữ liệu từ file CSV
+if (($handle = fopen($filename, "r")) !== FALSE) {
+    // Đọc dòng đầu tiên (header)
+    $headers = fgetcsv($handle, 1000, ",");
 
-        // Đọc tệp CSV
-        $file = fopen($csvTmpPath, 'r');
-        $data = [];
-        while (($row = fgetcsv($file)) !== false) {
-            $data[] = $row; // Lưu từng dòng dữ liệu vào mảng $data
-        }
-        fclose($file);
-
-        // Lưu vào session để sử dụng sau này
-        $_SESSION['csv_data'] = $data;
-
-        // Hiển thị dữ liệu
-        echo "<h1>Data from the CSV file:</h1>";
-        echo "<table border='1' cellpadding='5' style='border-collapse: collapse;'>";
-        echo "<thead style='background-color: #f2f2f2;'><tr>";
-        foreach ($data[0] as $header) { // Giả định dòng đầu tiên là tiêu đề
-            echo "<th>" . htmlspecialchars($header) . "</th>";
-        }
-        echo "</tr></thead>";
-        echo "<tbody>";
-        for ($i = 1; $i < count($data); $i++) { // Hiển thị dữ liệu từ dòng thứ 2 trở đi
-            echo "<tr>";
-            foreach ($data[$i] as $cell) {
-                echo "<td>" . htmlspecialchars($cell) . "</td>";
-            }
-            echo "</tr>";
-        }
-        echo "</tbody>";
-        echo "</table>";
-    } else {
-        echo "<p style='color: red;'>File upload failed! Please try again.</p>";
+    // Đọc từng dòng dữ liệu
+    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $sinhvien[] = array_combine($headers, $data);
     }
+
+    fclose($handle);
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload CSV</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        table {
-            width: 100%;
-            border: 1px solid #ddd;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-    </style>
+    <title>Danh sách sinh viên</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <h1>Upload CSV File</h1>
-    <form method="POST" enctype="multipart/form-data" action="">
-        <label for="csv_file">Select a CSV file:</label>
-        <input type="file" id="csv_file" name="csv_file" accept=".csv" required>
-        <br><br>
-        <button type="submit">Upload</button>
-    </form>
+    <div class="container mt-5">
+        <h1 class="text-center">Danh sách sinh viên</h1>
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Họ</th>
+                    <th>Tên</th>
+                    <th>Thành phố</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Hiển thị từng sinh viên
+                foreach ($sinhvien as $sv) {
+                    echo "<tr>";
+                    echo "<td>{$sv['username']}</td>";
+                    echo "<td>{$sv['password']}</td>";
+                    echo "<td>{$sv['lastname']}</td>";
+                    echo "<td>{$sv['firstname']}</td>";
+                    echo "<td>{$sv['city']}</td>";
+                    echo "<td>{$sv['email']}</td>";
+                    echo "</tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
