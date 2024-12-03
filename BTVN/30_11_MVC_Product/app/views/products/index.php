@@ -24,7 +24,7 @@
                     <td><?php echo $product['name']; ?></td>
                     <td><?php echo $product['price']; ?></td>
                     <td>
-                        <a href="?action=edit&id=<?php echo $product['id']; ?>" class="btn btn-warning">Sửa</a>
+                        <a href="?action=edit&id=<?php echo $product['id']; ?>" class="btn btn-secondary">Sửa</a>
                     </td>
                     <td>
                         <a href="?action=delete&id=<?php echo $product['id']; ?>" class="btn btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa?')">Xóa</a>
