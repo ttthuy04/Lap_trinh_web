@@ -13,8 +13,6 @@ Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 Route::post('/posts/store', [PostController::class, 'store'])->name('posts.store');
 Route::post('/posts', PostController::class . '@store')->name('posts.store');
 
-
-
 Route::get('/posts/{post}/edit', PostController::class . '@edit')->name('posts.edit');
 // updates a post
 Route::put('/posts/{id}', [PostController::class, 'update'])->name('posts.update');
